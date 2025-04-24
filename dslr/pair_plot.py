@@ -1,6 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
 # These features apparently do not provide enough differentiation between the houses and therefore are less useful for classification purposes in logistic regression.
 # Arithmancy, Potions and Care of Magical Creatures are homogeneous features so they should be ignored
@@ -14,7 +15,8 @@ def pair_plot(path):
     try:
         data = pd.read_csv(path)
         
-        del data['Index']
+        if 'Index' in data.columns:
+            del data['Index']
         # # similaire result (see Histogram)
         # del data['Care of Magical Creatures']
         # del data['Arithmancy']
@@ -28,5 +30,8 @@ def pair_plot(path):
 
 
 if __name__ == "__main__":
-    path = 'csv/dataset_train.csv'
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    else:
+        path = '../ressources/datasets/dataset_train.csv'
     pair_plot(path)
