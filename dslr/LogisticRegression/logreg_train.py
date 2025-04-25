@@ -24,7 +24,6 @@ class LogisticRegressionGradientDescent:
         print("Training complete. Model weights saved to model_weights.json")
 
     def process_data(self):
-        # Select features and target
         feature_columns = [
             "Arithmancy",
             "Astronomy",
@@ -41,40 +40,30 @@ class LogisticRegressionGradientDescent:
             "Flying",
         ]
 
-        # Extract features and target
         self.X_raw = self.data[feature_columns]
         self.y = self.data["Hogwarts House"]
 
-        # Handle missing values
         self.X_raw = self.X_raw.fillna(self.X_raw.mean())
 
-        # Store means and standard deviations for later use
         self.X_mean = self.X_raw.mean()
         self.X_std = self.X_raw.std()
 
-        # Normalize features
         self.X = (self.X_raw - self.X_mean) / self.X_std
 
-        # Add bias term (intercept)
         self.X.insert(0, "bias", 1)
 
-        # Get unique houses
         self.houses = self.y.unique()
         print(f"Found houses: {self.houses}")
 
     def sigmoid(self, z):
-        """Sigmoid function implementation"""
         return 1.0 / (1.0 + np.exp(-z))
 
     def predict(self, X, theta):
-        """Predict using logistic regression"""
         return self.sigmoid(np.dot(X, theta))
 
     def compute_cost(self, X, y, theta):
-        """Compute cost for logistic regression"""
         m = len(y)
         h = self.predict(X, theta)
-        # Avoid log(0) errors
         epsilon = 1e-5
         cost = (-1 / m) * (
             np.dot(y, np.log(h + epsilon))
@@ -83,21 +72,16 @@ class LogisticRegressionGradientDescent:
         return cost
 
     def run_gradient_descent(self, X, y, theta):
-        """Run gradient descent for logistic regression"""
         m = len(y)
         costs = []
 
         for i in range(self.iterations):
-            # Predict
             h = self.predict(X, theta)
 
-            # Calculate gradient
             gradient = np.dot(X.T, (h - y)) / m
 
-            # Update parameters
             theta = theta - self.learning_rate * gradient
 
-            # Calculate cost and store it
             if i % 100 == 0:
                 cost = self.compute_cost(X, y, theta)
                 costs.append(cost)
@@ -106,29 +90,23 @@ class LogisticRegressionGradientDescent:
         return theta, costs
 
     def train_one_vs_all(self):
-        """Train one-vs-all logistic regression models"""
         self.weights = {}
 
         for house in self.houses:
             print(f"\nTraining model for {house}...")
 
-            # Create binary labels (1 for current house, 0 for others)
             y_binary = (self.y == house).astype(int).values
 
-            # Initialize weights with zeros
             theta = np.zeros(self.X.shape[1])
 
-            # Run gradient descent
             theta, costs = self.run_gradient_descent(
                 self.X.values, y_binary, theta
             )
 
-            # Store weights for this house
             self.weights[house] = theta.tolist()
             print(f"Final cost for {house}: {costs[-1]}")
 
     def save_model_weights(self):
-        """Save model parameters to a file"""
         model = {
             "weights": self.weights,
             "X_mean": self.X_mean.to_dict(),
@@ -140,7 +118,6 @@ class LogisticRegressionGradientDescent:
 
 
 def parse_data(path: str) -> str:
-    """Validate the input data file"""
     try:
         open(path, "r")
     except FileNotFoundError:

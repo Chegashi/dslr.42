@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import math
-from utils import is_numerical, read_csv
-
+import csv
 
 def describe_data(headers, data):
     features = []
@@ -39,9 +38,9 @@ def describe_data(headers, data):
                     if sorted_values[j_sort] > sorted_values[j_sort + 1]:
                         sorted_values[j_sort], sorted_values[j_sort + 1] = sorted_values[j_sort + 1], sorted_values[j_sort]
             
-            p_25 = sorted_values[int(count * 0.25)]  # Q1
-            p_50 = sorted_values[int(count * 0.50)]  # Q2/median
-            p_75 = sorted_values[int(count * 0.75)]  # Q3
+            p_25 = sorted_values[int(count * 0.25)]
+            p_50 = sorted_values[int(count * 0.50)]
+            p_75 = sorted_values[int(count * 0.75)]
             
             q1 = sorted_values[int(count * 0.1)]
             q2 = sorted_values[int(count * 0.2)]
@@ -102,6 +101,22 @@ def print_features_table(features):
                 print(f'{value[label]:.6f}'.ljust(len(key) + 10), end='\t')
         print('\n')
 
+def read_csv(path):
+    data = []
+    with open(path, 'r') as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        for row in reader:
+            data.append(row)
+    return headers, data
+
+def is_numerical(column):
+    for value in column:
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python describe.py <path to csv file>")
